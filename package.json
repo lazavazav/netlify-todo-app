@@ -8,7 +8,8 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "core-js": "^3.6.5",
+    "@brianmmdev/faunaservice": "^1.0.3",
+    "core-js": "^3.9.1",
     "vue": "^2.6.11"
   },
   "devDependencies": {
