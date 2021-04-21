@@ -1,9 +1,13 @@
 const FaunaService = require('@brianmmdev/faunaservice')
 
 exports.handler = async (event, context) => {
-  const service = new FaunaService("fnAEFBljzbACAHwvXdujWrjylUlSLaU7GwtMIifc")
+  console.log(JSON.stringify(event))
+  console.log(JSON.stringify(context))
+  const service = new FaunaService("fnAEHWwaWcACA2OL-nIqxJ2awi5Lp9uivhbmvFdE")
   
   let tasks = await service.listRecords("Tasks")
+  let user = context.clientContext.user
+  tasks = tasks.filter(t => t.userId === user.sub)
 
   return {
     statusCode: 200,

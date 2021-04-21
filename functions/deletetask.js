@@ -1,7 +1,7 @@
 const FaunaService = require('@brianmmdev/faunaservice')
 
 exports.handler = async (event, context) => {
-  const service = new FaunaService("fnAEFBljzbACAHwvXdujWrjylUlSLaU7GwtMIifc")
+  const service = new FaunaService("fnAEF5RzmzACBsIreTbRaTOSd_q1R637hynKEmfI")
 
   let body = JSON.parse(event.body)
   
