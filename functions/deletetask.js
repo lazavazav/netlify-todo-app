@@ -1,12 +1,16 @@
 const FaunaService = require('@brianmmdev/faunaservice')
 
 exports.handler = async (event, context) => {
-  const service = new FaunaService("fnAEFBljzbACAHwvXdujWrjylUlSLaU7GwtMIifc")
+  let user = context.clientContext.user
+  const service = new FaunaService("fnAEHW6T8VAGA3WSswOuoVy-s66wwLMk0VnIhXmW")
 
   let body = JSON.parse(event.body)
-  
-  await service.deleteRecord("Tasks", body.id)
 
+  let task = service.getRecordById("Tasks", body.id)
+  if(task && task.userId == user.sub) {
+    await service.deleteRecord("Tasks", body.id)
+  }
+  
   return {
     statusCode: 200,
     headers: {

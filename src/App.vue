@@ -1,17 +1,25 @@
 <template>
   <div id="app">
-    <h1>Vue Todo App</h1>
-    <div class="add-task-wrapper">
-      <input type="text" v-model="newTaskInput" @keydown.enter="addTask">
-      <button @click="addTask">Add task</button>
+    <div class="header">
+      <h1>Vue Todo App</h1>
+      <div data-netlify-identity-menu></div>
     </div>
-    <div class="task" v-for="task in tasks" :key="task.id">
-      <div class="task-main">
-        <span>{{ task.name }}</span>
-        <span class="buttons">
-          <button @click="removeTask(task.id)">❌</button>
-        </span>
+    <div v-if="isLoggedIn">
+      <div class="add-task-wrapper">
+        <input type="text" v-model="newTaskInput" @keydown.enter="addTask">
+        <button @click="addTask">Add task</button>
       </div>
+      <div class="task" v-for="task in tasks" :key="task.id">
+        <div class="task-main">
+          <span>{{ task.name }}</span>
+          <span class="buttons">
+            <button @click="removeTask(task.id)">❌</button>
+          </span>
+        </div>
+      </div>
+    </div>
+    <div v-else>
+      Please log in.
     </div>
   </div>
 </template>
@@ -22,19 +30,53 @@ export default {
   data() {
     return {
       tasks: [],
-      newTaskInput: ""
+      newTaskInput: "",
+      isLoggedIn: false,
+      token: ""
     }
   },
   async created() {
-    let response = await fetch("https://clever-bhaskara-8b1e3b.netlify.app/.netlify/functions/listtasks")
-    this.tasks = await response.json()
+    const self = this
+    // eslint-disable-next-line no-undef
+    netlifyIdentity.on('init', async user => {
+      if(user) {
+        self.token = user.token.access_token
+        await self.listTasks()
+        self.isLoggedIn = true
+      }
+    })
+
+    // eslint-disable-next-line no-undef
+    netlifyIdentity.on('login', async user => {
+      self.token = user.token.access_token
+      await self.listTasks()
+      self.isLoggedIn = true
+    })
+
+    // eslint-disable-next-line no-undef
+    netlifyIdentity.on('logout', () => {
+      self.isLoggedIn = false
+      self.newTaskInput = ""
+      self.tasks = []
+      self.token = ""
+    })
   },
   methods: {
+    async listTasks() {
+      let response = await fetch("/.netlify/functions/listtasks", {
+        headers: {
+          "Authorization": `Bearer ${this.token}`
+        }
+      })
+      this.tasks = await response.json()
+    },
+
     async addTask() {
-      let response = await fetch("https://clever-bhaskara-8b1e3b.netlify.app/.netlify/functions/addtask", {
+      let response = await fetch("/.netlify/functions/addtask", {
         method: "post",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${this.token}`
         },
         body: JSON.stringify({
           name: this.newTaskInput
@@ -47,10 +89,11 @@ export default {
     },
 
     async removeTask(taskId) {
-      await fetch("https://clever-bhaskara-8b1e3b.netlify.app/.netlify/functions/deletetask", {
+      await fetch("/.netlify/functions/deletetask", {
         method: "delete",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${this.token}`
         },
         body: JSON.stringify({
           id: taskId
