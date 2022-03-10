@@ -3,6 +3,8 @@
     <div class="header">
       <h1>Sasa Demo App</h1>
       <div data-netlify-identity-menu></div>
+      <button type="button" class="identity-signup">Signup</button>
+      <button type="button" class="identity-login">Login</button>
       <button type="button" class="identity-logout">Logout</button>
     </div>
     <div v-if="isLoggedIn">
