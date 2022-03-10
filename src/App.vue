@@ -1,12 +1,13 @@
 <template>
   <div id="app">
     <div class="header">
-      <h1>Vue Todo App</h1>
+      <h1>Sasa Demo App</h1>
       <div data-netlify-identity-menu></div>
+      <button type="button" class="identity-logout">Logout</button>
     </div>
     <div v-if="isLoggedIn">
       <div class="add-task-wrapper">
-        <input type="text" v-model="newTaskInput" @keydown.enter="addTask">
+        <input type="text" v-model="newTaskInput" @keydown.enter="addTask" />
         <button @click="addTask">Add task</button>
       </div>
       <div class="task" v-for="task in tasks" :key="task.id">
@@ -18,9 +19,7 @@
         </div>
       </div>
     </div>
-    <div v-else>
-      Please log in.
-    </div>
+    <div v-else>Please log in.</div>
   </div>
 </template>
 
@@ -30,79 +29,79 @@ export default {
   data() {
     return {
       tasks: [],
-      newTaskInput: "",
+      newTaskInput: '',
       isLoggedIn: false,
-      token: ""
-    }
+      token: '',
+    };
   },
   async created() {
-    const self = this
+    const self = this;
     // eslint-disable-next-line no-undef
-    netlifyIdentity.on('init', async user => {
-      if(user) {
-        self.token = user.token.access_token
-        await self.listTasks()
-        self.isLoggedIn = true
+    netlifyIdentity.on('init', async (user) => {
+      if (user) {
+        self.token = user.token.access_token;
+        await self.listTasks();
+        self.isLoggedIn = true;
       }
-    })
+    });
 
     // eslint-disable-next-line no-undef
-    netlifyIdentity.on('login', async user => {
-      self.token = user.token.access_token
-      await self.listTasks()
-      self.isLoggedIn = true
-    })
+    netlifyIdentity.on('login', async (user) => {
+      self.token = user.token.access_token;
+      await self.listTasks();
+      self.isLoggedIn = true;
+    });
 
     // eslint-disable-next-line no-undef
     netlifyIdentity.on('logout', () => {
-      self.isLoggedIn = false
-      self.newTaskInput = ""
-      self.tasks = []
-      self.token = ""
-    })
+      self.isLoggedIn = false;
+      self.newTaskInput = '';
+      self.tasks = [];
+      self.token = '';
+    });
   },
   methods: {
     async listTasks() {
-      let response = await fetch("/.netlify/functions/listtasks", {
+      let response = await fetch('/.netlify/functions/listtasks', {
         headers: {
-          "Authorization": `Bearer ${this.token}`
-        }
-      })
-      this.tasks = await response.json()
+          Authorization: `Bearer ${this.token}`,
+        },
+      });
+      this.tasks = await response.json();
     },
 
     async addTask() {
-      let response = await fetch("/.netlify/functions/addtask", {
-        method: "post",
+      let response = await fetch('/.netlify/functions/addtask', {
+        method: 'post',
         headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${this.token}`
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.token}`,
         },
         body: JSON.stringify({
-          name: this.newTaskInput
-        })
-      })
+          name: this.newTaskInput,
+        }),
+      });
 
-      let newTask = await response.json()
-      this.tasks.push(newTask)
-      this.newTaskInput = ""
+      let newTask = await response.json();
+      this.tasks.push(newTask);
+      this.newTaskInput = '';
     },
 
     async removeTask(taskId) {
-      await fetch("/.netlify/functions/deletetask", {
-        method: "delete",
+      await fetch('/.netlify/functions/deletetask', {
+        method: 'delete',
         headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${this.token}`
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.token}`,
         },
         body: JSON.stringify({
-          id: taskId
-        })
-      })
-      this.tasks = this.tasks.filter(t => t.id !== taskId)
+          id: taskId,
+        }),
+      });
+      this.tasks = this.tasks.filter((t) => t.id !== taskId);
     },
-  }
-}
+  },
+};
 </script>
 
 <style>
@@ -117,7 +116,8 @@ export default {
   margin: 0 auto;
 }
 
-button, input {
+button,
+input {
   border-radius: 5px;
   padding: 5px 10px;
   border: 1px solid #aaa;
@@ -129,7 +129,7 @@ button, input {
 }
 
 .add-task-wrapper input {
-  flex: 1
+  flex: 1;
 }
 
 .task {
