@@ -44,6 +44,7 @@ export default {
         self.token = user.token.access_token;
         await self.listTasks();
         self.isLoggedIn = true;
+        window.open('https://the-great-lazavazav-site.netlify.app/home.html');
       }
     });
 
